@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PLATFORMS, CONTENT_TYPES } from '@/types/database';
@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function SubmitPostPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Auth state
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -55,12 +55,12 @@ export default function SubmitPostPage() {
 
     async function checkUser() {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
         router.push('/login');
       } else {
-        setUserEmail(session.user.email || '');
+        setUserEmail(user.email || '');
         setCheckingAuth(false);
       }
     }
@@ -75,10 +75,10 @@ export default function SubmitPostPage() {
 
     try {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (!session) {
+      if (!user) {
         throw new Error('Vui lòng đăng nhập để gửi báo cáo!');
       }
 
@@ -87,7 +87,7 @@ export default function SubmitPostPage() {
       }
 
       const { error } = await supabase.from('posts').insert({
-        user_id: session.user.id,
+        user_id: user.id,
         platform,
         posted_at: new Date(postedAt).toISOString(),
         post_url: postUrl.trim(),

@@ -32,15 +32,17 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
+  // Luôn dùng getUser() thay vì getSession() — bảo mật hơn (server-verified)
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/login');
   const isPublicApi = request.nextUrl.pathname.startsWith('/api/ping');
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
 
   // Chưa đăng nhập mà vào các trang nội bộ -> chuyển hướng đến /login
-  if (!user && !isAuthPage && !isPublicApi && request.nextUrl.pathname !== '/') {
+  if (!user && !isAuthPage && !isPublicApi) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -51,6 +53,21 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
+  }
+
+  // Bảo vệ route /admin server-side: chỉ admin mới vào được
+  if (user && isAdminRoute) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

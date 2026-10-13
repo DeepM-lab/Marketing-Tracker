@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Post } from '@/types/database';
@@ -21,7 +21,7 @@ import {
 
 export default function MyPostsPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,10 +38,10 @@ export default function MyPostsPage() {
   const fetchMyPosts = useCallback(async () => {
     try {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (!session) {
+      if (!user) {
         router.push('/login');
         return;
       }
@@ -49,7 +49,7 @@ export default function MyPostsPage() {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .order('posted_at', { ascending: false });
 
       if (error) throw error;

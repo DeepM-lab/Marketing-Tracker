@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { LogIn, UserPlus, Sparkles, AlertCircle, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { translateSupabaseError } from '@/lib/utils/errorMessages';
+import { LogIn, UserPlus, Sparkles, AlertCircle, Eye, EyeOff, ArrowLeft, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+type AuthMode = 'login' | 'signup' | 'forgot';
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,14 +24,44 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  const resetMessages = () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+  };
+
+  const switchMode = (newMode: AuthMode) => {
+    setMode(newMode);
+    resetMessages();
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    resetMessages();
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
+      setSuccessMsg('Đã gửi email đặt lại mật khẩu! Vui lòng kiểm tra hộp thư (kể cả Spam).');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setErrorMsg(translateSupabaseError(error.message) || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg('');
-    setSuccessMsg('');
+    resetMessages();
 
     try {
-      if (isSignUp) {
+      if (mode === 'signup') {
         if (password !== confirmPassword) {
           throw new Error('Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.');
         }
@@ -47,9 +80,7 @@ export default function LoginPage() {
         });
         if (error) throw error;
         setSuccessMsg('Đăng ký thành công! Hãy đăng nhập bằng tài khoản vừa tạo.');
-        setIsSignUp(false);
-        setPassword('');
-        setConfirmPassword('');
+        switchMode('login');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -61,7 +92,7 @@ export default function LoginPage() {
       }
     } catch (err: unknown) {
       const error = err as Error;
-      setErrorMsg(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      setErrorMsg(translateSupabaseError(error.message) || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -82,11 +113,17 @@ export default function LoginPage() {
             <Sparkles className="h-5 w-5" />
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            {isSignUp ? 'Tạo tài khoản mới' : 'Đăng nhập MktTracker'}
+            {mode === 'signup'
+              ? 'Tạo tài khoản mới'
+              : mode === 'forgot'
+              ? 'Đặt lại mật khẩu'
+              : 'Đăng nhập MktTracker'}
           </h1>
           <p className="mt-1 text-xs text-slate-500">
-            {isSignUp
+            {mode === 'signup'
               ? 'Nhập thông tin nhân viên để bắt đầu báo cáo bài'
+              : mode === 'forgot'
+              ? 'Nhập email để nhận link đặt lại mật khẩu'
               : 'Theo dõi và tổng hợp tiến độ marketing nội bộ'}
           </p>
         </div>
@@ -94,6 +131,7 @@ export default function LoginPage() {
         <AnimatePresence mode="wait">
           {errorMsg && (
             <motion.div
+              key="error"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -106,6 +144,7 @@ export default function LoginPage() {
 
           {successMsg && (
             <motion.div
+              key="success"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -116,130 +155,176 @@ export default function LoginPage() {
           )}
         </AnimatePresence>
 
-        <form onSubmit={handleAuth} className="space-y-3.5">
-          {isSignUp && (
+        {/* FORGOT PASSWORD FORM */}
+        {mode === 'forgot' ? (
+          <form onSubmit={handleForgotPassword} className="space-y-3.5">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
-                Họ và tên
-              </label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Nguyễn Văn A"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              Email công việc
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ten@congty.com"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              Mật khẩu
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 transition"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              </button>
-            </div>
-          </div>
-
-          {isSignUp && (
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Nhập lại mật khẩu
+                Email công việc
               </label>
               <div className="relative">
                 <input
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type="email"
                   required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ten@congty.com"
+                  className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                />
+                <Mail className="absolute left-3 top-2 h-3.5 w-3.5 text-slate-400" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <>
+                  <Mail className="h-3.5 w-3.5" /> Gửi link đặt lại mật khẩu
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => switchMode('login')}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition pt-1"
+            >
+              <ArrowLeft className="h-3 w-3" /> Quay lại đăng nhập
+            </button>
+          </form>
+        ) : (
+          /* LOGIN / SIGNUP FORM */
+          <form onSubmit={handleAuth} className="space-y-3.5">
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Họ và tên
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Nguyễn Văn A"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Email công việc
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ten@congty.com"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 transition"
                   tabIndex={-1}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                 </button>
               </div>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
-          >
-            {loading ? (
-              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : isSignUp ? (
-              <>
-                <UserPlus className="h-3.5 w-3.5" /> Đăng ký tài khoản
-              </>
-            ) : (
-              <>
-                <LogIn className="h-3.5 w-3.5" /> Đăng nhập
-              </>
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Nhập lại mật khẩu
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 transition"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
             )}
-          </button>
-        </form>
 
-        <div className="mt-5 border-t border-slate-100 pt-4 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setErrorMsg('');
-              setSuccessMsg('');
-              setPassword('');
-              setConfirmPassword('');
-            }}
-            className="text-xs font-medium text-slate-600 hover:text-slate-900 transition underline underline-offset-4"
-          >
-            {isSignUp
-              ? 'Đã có tài khoản? Đăng nhập ngay'
-              : 'Chưa có tài khoản? Nhấn để đăng ký'}
-          </button>
-        </div>
+            {mode === 'login' && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => switchMode('forgot')}
+                  className="text-[11px] text-slate-400 hover:text-slate-700 transition underline underline-offset-2"
+                >
+                  Quên mật khẩu?
+                </button>
+              </div>
+            )}
 
-        <div className="mt-5 rounded-xl border border-slate-200/80 bg-slate-50/60 p-2.5 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
-          <ShieldCheck className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-          <span>
-            Admin quản trị: <strong className="text-slate-700 font-mono">deepmlab12@gmail.com</strong>
-          </span>
-        </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : mode === 'signup' ? (
+                <>
+                  <UserPlus className="h-3.5 w-3.5" /> Đăng ký tài khoản
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-3.5 w-3.5" /> Đăng nhập
+                </>
+              )}
+            </button>
+          </form>
+        )}
+
+        {mode !== 'forgot' && (
+          <div className="mt-5 border-t border-slate-100 pt-4 text-center">
+            <button
+              type="button"
+              onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+              className="text-xs font-medium text-slate-600 hover:text-slate-900 transition underline underline-offset-4"
+            >
+              {mode === 'signup'
+                ? 'Đã có tài khoản? Đăng nhập ngay'
+                : 'Chưa có tài khoản? Nhấn để đăng ký'}
+            </button>
+          </div>
+        )}
       </motion.div>
     </div>
   );

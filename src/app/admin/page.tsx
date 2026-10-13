@@ -8,7 +8,6 @@ import * as XLSX from 'xlsx';
 import {
   BarChart3,
   Download,
-  Filter,
   ExternalLink,
   Layers,
   Heart,
@@ -18,7 +17,6 @@ import {
   ShieldAlert,
   Search,
   Calendar,
-  ChevronDown,
 } from 'lucide-react';
 
 type TimePreset = 'ALL' | 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_QUARTER' | 'THIS_YEAR' | 'CUSTOM';
@@ -113,10 +111,10 @@ export default function AdminDashboardPage() {
   const checkAdminAndFetchPosts = useCallback(async () => {
     try {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (!session) {
+      if (!user) {
         router.push('/login');
         return;
       }
@@ -124,11 +122,10 @@ export default function AdminDashboardPage() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
 
-      const isAdmin =
-        profile?.role === 'admin' || session.user.email === 'deepmlab12@gmail.com';
+      const isAdmin = profile?.role === 'admin';
 
       if (!isAdmin) {
         setIsAuthorized(false);
@@ -256,7 +253,11 @@ export default function AdminDashboardPage() {
 
       targetPosts = posts.filter((p) => {
         const pTime = new Date(p.posted_at).getTime();
-        return pTime >= sTime && pTime <= eTime;
+        if (pTime < sTime || pTime > eTime) return false;
+        // Áp dụng thêm bộ lọc platform và staff nếu đang được chọn
+        if (selectedPlatform !== 'ALL' && p.platform !== selectedPlatform) return false;
+        if (selectedStaff !== 'ALL' && p.user_id !== selectedStaff) return false;
+        return true;
       });
     }
 
@@ -337,7 +338,7 @@ export default function AdminDashboardPage() {
             title="Xuất file theo danh sách đang hiển thị"
           >
             <Download className="h-3.5 w-3.5" />
-            Xuất Excel ({filteredPosts.length} bài)
+            Xuất Excel
           </button>
         </div>
       </div>
