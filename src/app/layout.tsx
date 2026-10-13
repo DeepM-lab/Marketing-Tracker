@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Marketing Tracker - Theo dõi tiến độ bài đăng',
@@ -13,12 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white flex flex-col">
+    <html lang="vi" className={inter.variable}>
+      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col font-sans">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-          <p>© 2026 Marketing Activity Tracker. Thiết kế tối ưu cho đội ngũ Marketing.</p>
+        <footer className="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-5 text-center text-xs text-slate-400">
+          <p>© 2026 Marketing Tracker · DeepM Lab · Thiết kế tối ưu cho đội ngũ Marketing.</p>
         </footer>
       </body>
     </html>

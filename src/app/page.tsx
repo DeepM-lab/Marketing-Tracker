@@ -9,28 +9,29 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
-  Sparkles,
   Calendar,
   Layers,
   FileText,
   BarChart2,
+  TrendingUp,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function SubmitPostPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  // Kiểm tra đăng nhập
+  // Auth state
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [userEmail, setUserEmail] = useState('');
 
-  // Form states - Các trường BẮT BUỘC
+  // Required form states
   const [platform, setPlatform] = useState<string>(PLATFORMS[0]);
   const [postedAt, setPostedAt] = useState<string>('');
   const [postUrl, setPostUrl] = useState<string>('');
   const [contentType, setContentType] = useState<string>(CONTENT_TYPES[0]);
 
-  // Form states - Các trường TÙY CHỌN / MỞ RỘNG
+  // Optional form states
   const [campaign, setCampaign] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [likes, setLikes] = useState<number>(0);
@@ -38,15 +39,13 @@ export default function SubmitPostPage() {
   const [shares, setShares] = useState<number>(0);
   const [views, setViews] = useState<number>(0);
 
-  // Status
+  // Submission feedback
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Tự động gán giờ hiện tại làm giá trị mặc định cho posted_at
   useEffect(() => {
     const now = new Date();
-    // Format YYYY-MM-DDThh:mm cho input type="datetime-local"
     const tzOffset = now.getTimezoneOffset() * 60000;
     const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
     setPostedAt(localISOTime);
@@ -77,12 +76,11 @@ export default function SubmitPostPage() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        throw new Error('Vui lòng đăng nhập để gửi bài báo cáo!');
+        throw new Error('Vui lòng đăng nhập để gửi báo cáo!');
       }
 
-      // Kiểm tra các trường bắt buộc
       if (!platform.trim() || !postedAt.trim() || !postUrl.trim() || !contentType.trim()) {
-        throw new Error('Vui lòng điền đầy đủ các trường bắt buộc (*)');
+        throw new Error('Vui lòng điền đầy đủ các thông tin bắt buộc (*)');
       }
 
       const { error } = await supabase.from('posts').insert({
@@ -102,7 +100,6 @@ export default function SubmitPostPage() {
       if (error) throw error;
 
       setSuccess(true);
-      // Reset form một phần để tiện nhập bài tiếp theo
       setPostUrl('');
       setNotes('');
       setLikes(0);
@@ -120,65 +117,86 @@ export default function SubmitPostPage() {
   if (checkingAuth) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-indigo-600" />
-          Báo cáo bài đăng Marketing
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Điền thông tin bài bạn vừa đăng để ghi nhận tiến độ công việc. Đang báo cáo dưới tài khoản:{' '}
-          <span className="font-semibold text-slate-700">{userEmail}</span>
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-5">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            Báo cáo bài đăng
+          </h1>
+          <p className="mt-1 text-xs text-slate-500">
+            Ghi nhận tiến độ phân phối nội dung cho chiến dịch marketing.
+          </p>
+        </div>
+        <div className="text-xs text-slate-500 font-mono bg-white px-2.5 py-1 rounded-md border border-slate-200 w-fit">
+          {userEmail}
+        </div>
       </div>
 
-      {success && (
-        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-semibold">Báo cáo bài đăng thành công!</p>
-            <p className="text-xs text-emerald-700 mt-0.5">
-              Dữ liệu đã được lưu vào hệ thống để sếp theo dõi. Bạn có thể tiếp tục nhập bài khác hoặc xem ở trang &ldquo;Bài của tôi&rdquo;.
-            </p>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/90 p-4 text-emerald-900 shadow-2xs"
+          >
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+            <div className="text-xs">
+              <p className="font-semibold text-emerald-950">Đã lưu bài đăng thành công!</p>
+              <p className="text-emerald-700 mt-0.5">
+                Dữ liệu đã được cập nhật vào dashboard. Bạn có thể xem hoặc chỉnh sửa số liệu sau tại mục &ldquo;Bài của tôi&rdquo;.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
-      {errorMsg && (
-        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800">
-          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-semibold">Có lỗi xảy ra</p>
-            <p className="text-xs text-rose-700 mt-0.5">{errorMsg}</p>
-          </div>
-        </div>
-      )}
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/90 p-4 text-rose-900 shadow-2xs"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+            <div className="text-xs">
+              <p className="font-semibold text-rose-950">Chưa thể gửi dữ liệu</p>
+              <p className="text-rose-700 mt-0.5">{errorMsg}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-7 shadow-xs"
+      >
         {/* KHỐI 1: THÔNG TIN BẮT BUỘC */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-xs text-indigo-700 font-bold">1</span>
-            Thông tin bắt buộc
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-900 text-[11px] font-bold text-white">
+              1
+            </span>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+              Thông tin bắt buộc
+            </h2>
+          </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {/* 1. Kênh đăng */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <label className="block text-xs font-medium text-slate-700 mb-1">
                 Kênh đăng <span className="text-rose-500">*</span>
               </label>
               <select
                 required
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p} value={p}>
@@ -188,32 +206,30 @@ export default function SubmitPostPage() {
               </select>
             </div>
 
-            {/* 2. Ngày giờ đăng */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                Ngày & giờ đăng <span className="text-rose-500">*</span>
+              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
+                <Calendar className="h-3 w-3 text-slate-400" />
+                Thời gian đăng <span className="text-rose-500">*</span>
               </label>
               <input
                 type="datetime-local"
                 required
                 value={postedAt}
                 onChange={(e) => setPostedAt(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               />
             </div>
 
-            {/* 3. Loại nội dung */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                <Layers className="h-3.5 w-3.5 text-slate-400" />
-                Loại nội dung <span className="text-rose-500">*</span>
+              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
+                <Layers className="h-3 w-3 text-slate-400" />
+                Định dạng nội dung <span className="text-rose-500">*</span>
               </label>
               <select
                 required
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               >
                 {CONTENT_TYPES.map((c) => (
                   <option key={c} value={c}>
@@ -223,11 +239,23 @@ export default function SubmitPostPage() {
               </select>
             </div>
 
-            {/* 4. Link bài đăng */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Chiến dịch (Campaign)
+              </label>
+              <input
+                type="text"
+                placeholder="Ví dụ: Chiến dịch Q4, Khuyến mãi..."
+                value={campaign}
+                onChange={(e) => setCampaign(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
-                Link bài đăng (URL) <span className="text-rose-500">*</span>
+              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
+                <ExternalLink className="h-3 w-3 text-slate-400" />
+                Đường dẫn bài đăng (URL) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="url"
@@ -235,7 +263,7 @@ export default function SubmitPostPage() {
                 placeholder="https://facebook.com/... hoặc https://tiktok.com/@.../video/..."
                 value={postUrl}
                 onChange={(e) => setPostUrl(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 font-mono"
               />
             </div>
           </div>
@@ -243,119 +271,107 @@ export default function SubmitPostPage() {
 
         <hr className="border-slate-100" />
 
-        {/* KHỐI 2: THÔNG TIN TÙY CHỌN & SỐ LIỆU */}
+        {/* KHỐI 2: GHI CHÚ */}
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-600 font-bold">2</span>
-            Chiến dịch & Ghi chú (Không bắt buộc)
-          </h2>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Chiến dịch / Campaign
-              </label>
-              <input
-                type="text"
-                placeholder="Ví dụ: Tết 2026, Ra mắt sản phẩm X..."
-                value={campaign}
-                onChange={(e) => setCampaign(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                <FileText className="h-3.5 w-3.5 text-slate-400" />
-                Ghi chú nội dung / Key Message
-              </label>
-              <textarea
-                rows={2}
-                placeholder="Mô tả tóm tắt nội dung bài đăng, góc tiếp cận..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100"
-              />
-            </div>
-          </div>
-        </div>
-
-        <hr className="border-slate-100" />
-
-        {/* KHỐI 3: SỐ LIỆU TƯƠNG TÁC BAN ĐẦU */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-600 font-bold">3</span>
-              Số liệu tương tác ban đầu (Có thể cập nhật sau)
+          <div className="flex items-center gap-2 mb-3">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[11px] font-bold text-slate-600">
+              2
+            </span>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+              Ghi chú nội dung (Tùy chọn)
             </h2>
-            <span className="text-xs text-slate-400 flex items-center gap-1">
-              <BarChart2 className="h-3.5 w-3.5" /> Mặc định là 0
+          </div>
+
+          <div>
+            <textarea
+              rows={2}
+              placeholder="Tóm tắt thông điệp cốt lõi, góc tiếp cận bài viết..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+            />
+          </div>
+        </div>
+
+        <hr className="border-slate-100" />
+
+        {/* KHỐI 3: SỐ LIỆU */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[11px] font-bold text-slate-600">
+                3
+              </span>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+                Số liệu ban đầu
+              </h2>
+            </div>
+            <span className="text-[11px] text-slate-400">
+              Có thể để 0 và cập nhật sau
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Likes / Reacts</label>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
+              <label className="text-[11px] font-medium text-slate-500 block mb-1">Likes / Reacts</label>
               <input
                 type="number"
                 min="0"
                 value={likes}
                 onChange={(e) => setLikes(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-center font-semibold text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Bình luận</label>
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
+              <label className="text-[11px] font-medium text-slate-500 block mb-1">Bình luận</label>
               <input
                 type="number"
                 min="0"
                 value={comments}
                 onChange={(e) => setComments(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-center font-semibold text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Chia sẻ</label>
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
+              <label className="text-[11px] font-medium text-slate-500 block mb-1">Chia sẻ</label>
               <input
                 type="number"
                 min="0"
                 value={shares}
                 onChange={(e) => setShares(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-center font-semibold text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Lượt xem (Views)</label>
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
+              <label className="text-[11px] font-medium text-slate-500 block mb-1">Lượt xem</label>
               <input
                 type="number"
                 min="0"
                 value={views}
                 onChange={(e) => setViews(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-center font-semibold text-slate-800 outline-none transition focus:border-indigo-600 focus:bg-white"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
           </div>
         </div>
 
-        {/* NÚT GỬI */}
-        <div className="pt-4">
+        <div className="pt-2">
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.99] transition disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-50"
           >
             {submitting ? (
               <>
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Đang lưu bài đăng...
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Đang lưu...
               </>
             ) : (
               <>
-                <Send className="h-4 w-4" />
+                <Send className="h-3.5 w-3.5" />
                 Gửi báo cáo bài đăng
               </>
             )}
