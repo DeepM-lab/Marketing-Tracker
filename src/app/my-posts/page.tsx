@@ -249,11 +249,12 @@ export default function MyPostsPage() {
 
                     <div>
                       <label className="text-[11px] text-slate-500 block mb-1">Ghi chú bổ sung</label>
-                      <input
-                        type="text"
+                      <textarea
+                        rows={3}
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs"
+                        placeholder="Cập nhật thêm ghi chú nếu cần..."
+                        className="w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-900 leading-relaxed outline-none focus:border-slate-900 resize-y min-h-[80px]"
                       />
                     </div>
 

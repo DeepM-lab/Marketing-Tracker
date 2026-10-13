@@ -284,11 +284,11 @@ export default function SubmitPostPage() {
 
           <div>
             <textarea
-              rows={2}
-              placeholder="Tóm tắt thông điệp cốt lõi, góc tiếp cận bài viết..."
+              rows={5}
+              placeholder="Tóm tắt thông điệp cốt lõi, góc tiếp cận bài viết, mục tiêu chiến dịch, hoặc các lưu ý khác..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-xs text-slate-900 leading-relaxed outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 min-h-[120px] resize-y"
             />
           </div>
         </div>
