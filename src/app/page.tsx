@@ -44,11 +44,14 @@ export default function SubmitPostPage() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  useEffect(() => {
+  const getNowLocalISO = () => {
     const now = new Date();
     const tzOffset = now.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
-    setPostedAt(localISOTime);
+    return new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+  };
+
+  useEffect(() => {
+    setPostedAt(getNowLocalISO());
 
     async function checkUser() {
       const {
@@ -100,6 +103,11 @@ export default function SubmitPostPage() {
       if (error) throw error;
 
       setSuccess(true);
+      // Xóa sạch toàn bộ form để nhân viên điền bài tiếp theo
+      setPlatform(PLATFORMS[0]);
+      setContentType(CONTENT_TYPES[0]);
+      setPostedAt(getNowLocalISO());
+      setCampaign('');
       setPostUrl('');
       setNotes('');
       setLikes(0);
