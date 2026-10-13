@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { LogIn, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
+import { LogIn, UserPlus, Sparkles, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +12,9 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -25,6 +28,13 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
+        if (password !== confirmPassword) {
+          throw new Error('Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.');
+        }
+        if (password.length < 6) {
+          throw new Error('Mật khẩu phải có ít nhất 6 ký tự.');
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -37,6 +47,8 @@ export default function LoginPage() {
         if (error) throw error;
         setSuccessMsg('Đăng ký thành công! Bạn có thể đăng nhập ngay.');
         setIsSignUp(false);
+        setPassword('');
+        setConfirmPassword('');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -119,15 +131,51 @@ export default function LoginPage() {
             <label className="block text-xs font-semibold text-slate-700 mb-1">
               Mật khẩu
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 pr-10 text-sm outline-none transition focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
+          {isSignUp && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Nhập lại mật khẩu
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 pr-10 text-sm outline-none transition focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -155,6 +203,8 @@ export default function LoginPage() {
               setIsSignUp(!isSignUp);
               setErrorMsg('');
               setSuccessMsg('');
+              setPassword('');
+              setConfirmPassword('');
             }}
             className="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition"
           >
