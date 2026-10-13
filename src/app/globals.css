@@ -5,11 +5,17 @@
   --foreground: #0f172a;
 }
 
+html {
+  font-size: 16px;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
+  font-size: 0.9375rem; /* 15px default readable size */
+  line-height: 1.6;
 }
 
 /* Subtle dot background for modern SaaS dashboard feel */

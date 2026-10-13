@@ -195,16 +195,16 @@ export default function SubmitPostPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-800 mb-1.5">
                 Kênh đăng <span className="text-rose-500">*</span>
               </label>
               <select
                 required
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p} value={p}>
@@ -215,8 +215,8 @@ export default function SubmitPostPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
-                <Calendar className="h-3 w-3 text-slate-400" />
+              <label className="block text-sm font-medium text-slate-800 mb-1.5 flex items-center gap-1.5">
+                <Calendar className="h-4 w-4 text-slate-400" />
                 Thời gian đăng <span className="text-rose-500">*</span>
               </label>
               <input
@@ -224,20 +224,20 @@ export default function SubmitPostPage() {
                 required
                 value={postedAt}
                 onChange={(e) => setPostedAt(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
-                <Layers className="h-3 w-3 text-slate-400" />
+              <label className="block text-sm font-medium text-slate-800 mb-1.5 flex items-center gap-1.5">
+                <Layers className="h-4 w-4 text-slate-400" />
                 Định dạng nội dung <span className="text-rose-500">*</span>
               </label>
               <select
                 required
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               >
                 {CONTENT_TYPES.map((c) => (
                   <option key={c} value={c}>
@@ -248,7 +248,7 @@ export default function SubmitPostPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-800 mb-1.5">
                 Chiến dịch (Campaign)
               </label>
               <input
@@ -256,13 +256,13 @@ export default function SubmitPostPage() {
                 placeholder="Ví dụ: Chiến dịch Q4, Khuyến mãi..."
                 value={campaign}
                 onChange={(e) => setCampaign(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
-                <ExternalLink className="h-3 w-3 text-slate-400" />
+              <label className="block text-sm font-medium text-slate-800 mb-1.5 flex items-center gap-1.5">
+                <ExternalLink className="h-4 w-4 text-slate-400" />
                 Đường dẫn bài đăng (URL) <span className="text-rose-500">*</span>
               </label>
               <input
@@ -271,7 +271,7 @@ export default function SubmitPostPage() {
                 placeholder="https://facebook.com/... hoặc https://tiktok.com/@.../video/..."
                 value={postUrl}
                 onChange={(e) => setPostUrl(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 font-mono"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 font-mono"
               />
             </div>
           </div>
@@ -282,10 +282,10 @@ export default function SubmitPostPage() {
         {/* KHỐI 2: GHI CHÚ */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[11px] font-bold text-slate-600">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-slate-700">
               2
             </span>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
               Ghi chú nội dung (Tùy chọn)
             </h2>
           </div>
@@ -296,7 +296,7 @@ export default function SubmitPostPage() {
               placeholder="Tóm tắt thông điệp cốt lõi, góc tiếp cận bài viết, mục tiêu chiến dịch, hoặc các lưu ý khác..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-xs text-slate-900 leading-relaxed outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 min-h-[120px] resize-y"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm text-slate-900 leading-relaxed outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 min-h-[120px] resize-y"
             />
           </div>
         </div>
