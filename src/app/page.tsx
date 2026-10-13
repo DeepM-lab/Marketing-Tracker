@@ -138,7 +138,7 @@ export default function SubmitPostPage() {
             Báo cáo bài đăng
           </h1>
           <p className="mt-1 text-xs text-slate-500">
-            Ghi nhận tiến độ phân phối nội dung cho chiến dịch marketing.
+            Ghi nhận tiến độ phân phối nội dung cho chiến dịch marketing của DeepM.
           </p>
         </div>
         <div className="text-xs text-slate-500 font-mono bg-white px-2.5 py-1 rounded-md border border-slate-200 w-fit">

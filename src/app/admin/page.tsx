@@ -284,8 +284,8 @@ export default function AdminDashboardPage() {
 
     const worksheet = XLSX.utils.json_to_sheet(dataForExport);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Báo cáo Marketing');
-    XLSX.writeFile(workbook, `Bao_Cao_Marketing_${scopeLabel}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Báo cáo Marketing DeepM');
+    XLSX.writeFile(workbook, `DeepM_Bao_Cao_Marketing_${scopeLabel}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   if (loading) {
@@ -323,7 +323,7 @@ export default function AdminDashboardPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight sm:text-2xl flex items-center gap-2">
             <BarChart3 className="h-6 w-6 text-slate-900" />
-            Dashboard Quản lý Marketing
+            Dashboard Marketing DeepM
           </h1>
           <p className="mt-1 text-xs text-slate-500">
             Theo dõi tổng hợp tiến độ bài đăng, lọc chi tiết và xuất báo cáo Excel theo ngày/tuần/tháng/quý/năm.

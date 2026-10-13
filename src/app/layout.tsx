@@ -10,8 +10,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Marketing Tracker - Theo dõi tiến độ bài đăng',
-  description: 'Hệ thống báo cáo và theo dõi tiến độ bài đăng Marketing cho đội ngũ & quản lý',
+  title: 'DeepM Marketing - Hệ thống theo dõi bài đăng',
+  description: 'Hệ thống báo cáo và quản lý tiến độ bài đăng Marketing cho DeepM',
+  icons: {
+    icon: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
 };
 
 export default function RootLayout({
@@ -21,11 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className={inter.variable}>
+      <head>
+        <link rel="icon" href="/logo.jpg" />
+      </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col font-sans">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-5 text-center text-xs text-slate-400">
-          <p>© 2026 Marketing Tracker · DeepM Lab · Thiết kế tối ưu cho đội ngũ Marketing.</p>
+        <footer className="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-5 text-center text-xs text-slate-500">
+          <p>© 2026 DeepM · Hệ thống Quản trị & Báo cáo Marketing · DeepM.vn</p>
         </footer>
       </body>
     </html>
