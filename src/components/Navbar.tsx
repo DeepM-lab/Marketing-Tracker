@@ -208,11 +208,8 @@ export default function Navbar() {
                 className="h-8 w-8 rounded-lg object-contain border border-slate-200/90 shadow-2xs group-hover:scale-95 transition-transform"
               />
               <div className="flex flex-col">
-                <span className="font-bold text-slate-900 tracking-tight text-base leading-none flex items-center gap-1.5">
+                <span className="font-bold text-slate-900 tracking-tight text-base leading-none">
                   DeepM
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded">
-                    Mkt
-                  </span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium">Marketing Tracker</span>
               </div>
