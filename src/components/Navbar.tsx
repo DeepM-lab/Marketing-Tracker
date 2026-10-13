@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Profile } from '@/types/database';
 import {
@@ -19,6 +19,11 @@ import {
   EyeOff,
   CheckCircle2,
   AlertCircle,
+  User as UserIcon,
+  ChevronDown,
+  Mail,
+  Shield,
+  Calendar,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { translateSupabaseError } from '@/lib/utils/errorMessages';
@@ -32,10 +37,19 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // User Dropdown State (Hover & Click)
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // State cho Modal xem hồ sơ
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   // State cho Modal đổi mật khẩu
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -89,12 +103,27 @@ export default function Navbar() {
     };
   }, [supabase]);
 
-  // Đóng mobile menu khi chuyển trang
+  // Đóng mobile menu & dropdown khi chuyển trang
   useEffect(() => {
     setMobileMenuOpen(false);
+    setDropdownOpen(false);
   }, [pathname]);
 
+  const handleMouseEnter = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    setDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 200);
+  };
+
   const handleLogout = async () => {
+    setDropdownOpen(false);
     await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
@@ -105,23 +134,45 @@ export default function Navbar() {
     setPasswordError('');
     setPasswordSuccess('');
 
+    if (!oldPassword.trim()) {
+      setPasswordError('Vui lòng nhập mật khẩu hiện tại.');
+      return;
+    }
     if (newPassword.length < 6) {
       setPasswordError('Mật khẩu mới phải có ít nhất 6 ký tự.');
       return;
     }
+    if (newPassword === oldPassword) {
+      setPasswordError('Mật khẩu mới phải khác mật khẩu hiện tại.');
+      return;
+    }
     if (newPassword !== confirmNewPassword) {
-      setPasswordError('Mật khẩu xác nhận không khớp.');
+      setPasswordError('Mật khẩu xác nhận không trùng khớp.');
       return;
     }
 
     setPasswordLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
+      if (!user?.email) throw new Error('Không tìm thấy thông tin tài khoản.');
+
+      // 1. Xác thực mật khẩu cũ bằng cách thử signIn
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: oldPassword,
+      });
+
+      if (signInError) {
+        throw new Error('Mật khẩu cũ không chính xác. Vui lòng kiểm tra lại!');
+      }
+
+      // 2. Cập nhật sang mật khẩu mới
+      const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       });
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       setPasswordSuccess('Đổi mật khẩu thành công! Mật khẩu mới đã có hiệu lực.');
+      setOldPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
       setTimeout(() => {
@@ -194,48 +245,119 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT SIDE: USER DROPDOWN (Hover vào tên / admin để mở drop) */}
           <div className="flex items-center gap-3">
             {loading ? (
               <div className="h-8 w-24 animate-pulse rounded-md bg-slate-200/60" />
             ) : user ? (
               <>
-                {/* User info (Desktop) */}
-                <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-sm font-semibold text-slate-900 flex items-center justify-end gap-1.5">
-                    {profile?.full_name || user.email?.split('@')[0]}
-                    {isAdmin && (
-                      <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                        <ShieldCheck className="h-3.5 w-3.5" /> Admin
+                <div
+                  className="relative hidden sm:block"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {/* NÚT PROFILE / ADMIN BADGE CÓ HOVER */}
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-white/90 px-3 py-1.5 shadow-2xs hover:border-slate-300 hover:bg-slate-50 transition cursor-pointer select-none"
+                  >
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white shadow-2xs">
+                      {(profile?.full_name || user.email || 'U')[0].toUpperCase()}
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <span className="text-xs font-semibold text-slate-900 leading-tight flex items-center gap-1.5">
+                        {profile?.full_name || user.email?.split('@')[0]}
+                        {isAdmin && (
+                          <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.2 text-[10px] font-bold text-amber-700">
+                            <ShieldCheck className="h-3 w-3" /> Admin
+                          </span>
+                        )}
                       </span>
+                      <span className="text-[10px] text-slate-400 font-mono leading-tight">{user.email}</span>
+                    </div>
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${
+                        dropdownOpen ? 'rotate-180 text-slate-700' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {/* DROPDOWN MENU KHI DI CHUỘT / CLICK */}
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-1.5 w-56 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 z-50 backdrop-blur-md"
+                      >
+                        {/* Header thông tin trong drop */}
+                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                          <p className="text-xs font-semibold text-slate-900 truncate">
+                            {profile?.full_name || 'Nhân viên Marketing'}
+                          </p>
+                          <p className="text-[11px] text-slate-400 font-mono truncate">{user.email}</p>
+                          <div className="mt-1 flex items-center gap-1">
+                            {isAdmin ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 rounded-md px-1.5 py-0.5">
+                                <ShieldCheck className="h-3 w-3" /> Quản trị viên (Admin)
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 bg-slate-100 rounded-md px-1.5 py-0.5">
+                                <UserIcon className="h-3 w-3" /> Nhân viên
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 1. Xem hồ sơ */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setShowProfileModal(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 transition text-left"
+                        >
+                          <UserIcon className="h-4 w-4 text-slate-500" />
+                          <span>Xem hồ sơ</span>
+                        </button>
+
+                        {/* 2. Đổi mật khẩu */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setShowPasswordModal(true);
+                            setPasswordError('');
+                            setPasswordSuccess('');
+                            setOldPassword('');
+                            setNewPassword('');
+                            setConfirmNewPassword('');
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 transition text-left"
+                        >
+                          <KeyRound className="h-4 w-4 text-slate-500" />
+                          <span>Đổi mật khẩu</span>
+                        </button>
+
+                        <div className="my-1 border-t border-slate-100" />
+
+                        {/* 3. Đăng xuất */}
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 transition text-left"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Đăng xuất</span>
+                        </button>
+                      </motion.div>
                     )}
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono">{user.email}</span>
+                  </AnimatePresence>
                 </div>
-
-                {/* Đổi mật khẩu (Desktop) */}
-                <button
-                  onClick={() => {
-                    setShowPasswordModal(true);
-                    setPasswordError('');
-                    setPasswordSuccess('');
-                  }}
-                  title="Đổi mật khẩu"
-                  className="hidden md:flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition active:scale-95 shadow-2xs"
-                >
-                  <KeyRound className="h-3.5 w-3.5 text-slate-500" />
-                  <span>Đổi MK</span>
-                </button>
-
-                {/* Logout (Desktop) */}
-                <button
-                  onClick={handleLogout}
-                  title="Đăng xuất"
-                  className="hidden md:flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition active:scale-95 shadow-2xs"
-                >
-                  <LogOut className="h-3.5 w-3.5 text-slate-500" />
-                  <span>Thoát</span>
-                </button>
 
                 {/* Hamburger (Mobile) */}
                 <button
@@ -308,6 +430,18 @@ export default function Navbar() {
                   );
                 })}
 
+                {/* Xem hồ sơ (Mobile) */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setShowProfileModal(true);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                >
+                  <UserIcon className="h-4 w-4 text-slate-500" />
+                  Xem hồ sơ
+                </button>
+
                 {/* Đổi mật khẩu (Mobile) */}
                 <button
                   onClick={() => {
@@ -315,6 +449,9 @@ export default function Navbar() {
                     setShowPasswordModal(true);
                     setPasswordError('');
                     setPasswordSuccess('');
+                    setOldPassword('');
+                    setNewPassword('');
+                    setConfirmNewPassword('');
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
                 >
@@ -336,7 +473,104 @@ export default function Navbar() {
         </AnimatePresence>
       </header>
 
-      {/* MODAL ĐỔI MẬT KHẨU */}
+      {/* MODAL 1: XEM HỒ SƠ */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+                    <UserIcon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">Hồ sơ cá nhân</h3>
+                    <p className="text-[11px] text-slate-400">Thông tin tài khoản thành viên DeepM</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3.5">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white font-bold text-base">
+                    {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-bold text-slate-900 truncate">
+                      {profile?.full_name || 'Chưa cập nhật tên'}
+                    </h4>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold mt-0.5 ${
+                        isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-800'
+                      }`}
+                    >
+                      <Shield className="h-3 w-3" />
+                      {isAdmin ? 'Quản trị viên (Admin)' : 'Nhân viên Marketing'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs text-slate-600">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100">
+                    <span className="flex items-center gap-1.5 text-slate-500">
+                      <Mail className="h-3.5 w-3.5" /> Email
+                    </span>
+                    <span className="font-mono font-medium text-slate-900">{user?.email}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100">
+                    <span className="flex items-center gap-1.5 text-slate-500">
+                      <Calendar className="h-3.5 w-3.5" /> Ngày đăng ký
+                    </span>
+                    <span className="font-mono font-medium text-slate-900">
+                      {user?.created_at ? new Date(user.created_at).toLocaleDateString('vi-VN') : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProfileModal(false);
+                      setShowPasswordModal(true);
+                      setPasswordError('');
+                      setPasswordSuccess('');
+                      setOldPassword('');
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    <KeyRound className="h-3.5 w-3.5 text-slate-500" /> Đổi mật khẩu
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowProfileModal(false)}
+                    className="flex-1 rounded-xl bg-slate-900 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL 2: ĐỔI MẬT KHẨU (BẮT BUỘC ĐIỀN MẬT KHẨU CŨ) */}
       <AnimatePresence>
         {showPasswordModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
@@ -354,7 +588,7 @@ export default function Navbar() {
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">Đổi mật khẩu</h3>
-                    <p className="text-[11px] text-slate-400">Cập nhật mật khẩu bảo mật tài khoản</p>
+                    <p className="text-[11px] text-slate-400">Yêu cầu xác minh mật khẩu hiện tại</p>
                   </div>
                 </div>
                 <button
@@ -380,9 +614,34 @@ export default function Navbar() {
               )}
 
               <form onSubmit={handleChangePassword} className="mt-4 space-y-3">
+                {/* 1. MẬT KHẨU CŨ */}
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Mật khẩu mới (tối thiểu 6 ký tự)
+                    Mật khẩu hiện tại (cũ) <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showOldPassword ? 'text' : 'password'}
+                      required
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu hiện tại"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pr-9 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                    >
+                      {showOldPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. MẬT KHẨU MỚI */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Mật khẩu mới (tối thiểu 6 ký tự) <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -403,9 +662,10 @@ export default function Navbar() {
                   </div>
                 </div>
 
+                {/* 3. XÁC NHẬN MẬT KHẨU MỚI */}
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Xác nhận mật khẩu mới
+                    Xác nhận mật khẩu mới <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -439,7 +699,7 @@ export default function Navbar() {
                     disabled={passwordLoading}
                     className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                   >
-                    {passwordLoading ? 'Đang lưu...' : 'Lưu mật khẩu mới'}
+                    {passwordLoading ? 'Đang xác minh...' : 'Lưu mật khẩu mới'}
                   </button>
                 </div>
               </form>
