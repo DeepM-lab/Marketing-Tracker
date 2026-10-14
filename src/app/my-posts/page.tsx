@@ -62,7 +62,14 @@ export default function MyPostsPage() {
   }, [router, supabase]);
 
   useEffect(() => {
-    fetchMyPosts();
+    let isSubscribed = true;
+    (async () => {
+      await fetchMyPosts();
+      if (!isSubscribed) return;
+    })();
+    return () => {
+      isSubscribed = false;
+    };
   }, [fetchMyPosts]);
 
   const startEdit = (post: Post) => {

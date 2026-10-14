@@ -11,11 +11,14 @@ import {
   ExternalLink,
   Calendar,
   Layers,
-  FileText,
-  BarChart2,
-  TrendingUp,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+const getNowLocalISO = () => {
+  const now = new Date();
+  const tzOffset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+};
 
 export default function SubmitPostPage() {
   const router = useRouter();
@@ -44,27 +47,27 @@ export default function SubmitPostPage() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const getNowLocalISO = () => {
-    const now = new Date();
-    const tzOffset = now.getTimezoneOffset() * 60000;
-    return new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
-  };
-
   useEffect(() => {
-    setPostedAt(getNowLocalISO());
-
-    async function checkUser() {
+    let isSubscribed = true;
+    (async () => {
+      if (isSubscribed) {
+        setPostedAt(getNowLocalISO());
+      }
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      if (!isSubscribed) return;
       if (!user) {
         router.push('/login');
       } else {
         setUserEmail(user.email || '');
         setCheckingAuth(false);
       }
-    }
-    checkUser();
+    })();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [router, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {

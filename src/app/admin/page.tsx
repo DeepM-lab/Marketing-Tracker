@@ -150,7 +150,14 @@ export default function AdminDashboardPage() {
   }, [router, supabase]);
 
   useEffect(() => {
-    checkAdminAndFetchPosts();
+    let isSubscribed = true;
+    (async () => {
+      await checkAdminAndFetchPosts();
+      if (!isSubscribed) return;
+    })();
+    return () => {
+      isSubscribed = false;
+    };
   }, [checkAdminAndFetchPosts]);
 
   const staffList = useMemo(() => {
