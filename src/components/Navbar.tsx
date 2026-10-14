@@ -104,11 +104,13 @@ export default function Navbar() {
         };
     }, [supabase]);
 
-    // Đóng mobile menu & dropdown khi chuyển trang
-    useEffect(() => {
+    // Đóng mobile menu & dropdown khi chuyển trang (theo chuẩn React Docs: adjusting state during render để tránh cascading renders)
+    const [prevPathname, setPrevPathname] = useState(pathname);
+    if (pathname !== prevPathname) {
+        setPrevPathname(pathname);
         setMobileMenuOpen(false);
         setDropdownOpen(false);
-    }, [pathname]);
+    }
 
     const handleMouseEnter = () => {
         if (dropdownTimeoutRef.current) {
@@ -487,6 +489,7 @@ export default function Navbar() {
                                         <Link
                                             key={link.href}
                                             href={link.href}
+                                            onClick={() => setMobileMenuOpen(false)}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                                                 isActive
                                                     ? link.admin

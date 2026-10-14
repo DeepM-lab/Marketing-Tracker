@@ -47,15 +47,7 @@ export default function LoginPage() {
                 );
             }
         });
-
-        // Kiểm tra hash url nếu có type=recovery
-        if (
-            typeof window !== 'undefined' &&
-            window.location.hash.includes('type=recovery')
-        ) {
-            setMode('reset');
-        }
-
+        
         return () => {
             subscription.unsubscribe();
         };
