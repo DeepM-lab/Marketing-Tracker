@@ -229,7 +229,7 @@ export default function Navbar() {
                                 height={44}
                                 src="/logo.png"
                                 alt="DeepM Logo"
-                                className="h-10 w-10 sm:h-11 sm:w-11 object-contain group-hover:scale-95 transition-transform"
+                                className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-contain group-hover:scale-95 transition-transform"
                             />
                             <div className="flex flex-col">
                                 <span className="font-bold text-slate-900 tracking-tight text-base sm:text-lg leading-tight">

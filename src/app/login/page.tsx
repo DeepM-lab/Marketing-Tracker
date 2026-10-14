@@ -205,7 +205,7 @@ export default function LoginPage() {
                             height={56}
                             src="/logo.png"
                             alt="DeepM Logo"
-                            className="h-14 w-14 object-contain"
+                            className="h-14 w-14 object-contain rounded-xl"
                         />
                     </div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">
