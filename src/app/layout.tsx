@@ -30,7 +30,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="vi" className={inter.variable}>
+        <html lang="vi" className={inter.variable} suppressHydrationWarning>
             <head>
                 <link
                     rel="apple-touch-icon"
@@ -114,7 +114,10 @@ export default function RootLayout({
                     content="width=device-width, initial-scale=1"
                 />
             </head>
-            <body className="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col font-sans">
+            <body
+                className="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col font-sans"
+                suppressHydrationWarning
+            >
                 <Navbar />
                 <main className="flex-1">{children}</main>
                 <footer className="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-5 text-center text-xs text-slate-500">

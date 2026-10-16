@@ -177,7 +177,7 @@ export default function MyPostsPage() {
                       {post.content_type}
                     </span>
                     {post.campaign && (
-                      <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                      <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">
                         🎯 {post.campaign}
                       </span>
                     )}
@@ -213,55 +213,55 @@ export default function MyPostsPage() {
                     <p className="text-xs font-semibold text-slate-700">Cập nhật số liệu tương tác mới:</p>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                       <div>
-                        <label className="text-[11px] text-slate-500 block mb-1">Likes</label>
+                        <label className="text-xs text-slate-500 block mb-1">Likes</label>
                         <input
                           type="number"
                           min="0"
                           value={editLikes}
                           onChange={(e) => setEditLikes(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-center font-bold"
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-center font-bold"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-slate-500 block mb-1">Bình luận</label>
+                        <label className="text-xs text-slate-500 block mb-1">Bình luận</label>
                         <input
                           type="number"
                           min="0"
                           value={editComments}
                           onChange={(e) => setEditComments(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-center font-bold"
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-center font-bold"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-slate-500 block mb-1">Chia sẻ</label>
+                        <label className="text-xs text-slate-500 block mb-1">Chia sẻ</label>
                         <input
                           type="number"
                           min="0"
                           value={editShares}
                           onChange={(e) => setEditShares(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-center font-bold"
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-center font-bold"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-slate-500 block mb-1">Lượt xem (Views)</label>
+                        <label className="text-xs text-slate-500 block mb-1">Lượt xem (Views)</label>
                         <input
                           type="number"
                           min="0"
                           value={editViews}
                           onChange={(e) => setEditViews(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-center font-bold"
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-center font-bold"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-slate-500 block mb-1">Ghi chú bổ sung</label>
+                      <label className="text-xs text-slate-500 block mb-1">Ghi chú bổ sung</label>
                       <textarea
                         rows={3}
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
                         placeholder="Cập nhật thêm ghi chú nếu cần..."
-                        className="w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-900 leading-relaxed outline-none focus:border-slate-900 resize-y min-h-[80px]"
+                        className="w-full rounded-lg border border-slate-200 bg-white p-2.5 text-xs text-slate-900 leading-relaxed outline-none focus:border-slate-900 resize-y min-h-20"
                       />
                     </div>
 

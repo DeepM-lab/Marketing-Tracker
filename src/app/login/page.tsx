@@ -172,14 +172,14 @@ export default function LoginPage() {
                             className="h-14 w-14 object-contain rounded-xl"
                         />
                     </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                         {mode === 'forgot'
                             ? 'Quên mật khẩu'
                             : mode === 'reset'
                               ? 'Thiết lập mật khẩu mới'
                               : 'Đăng nhập DeepM Marketing'}
                     </h1>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-sm text-slate-500">
                         {mode === 'forgot'
                             ? 'Nhập email để nhận liên kết đặt lại mật khẩu'
                             : mode === 'reset'
@@ -195,7 +195,7 @@ export default function LoginPage() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mb-4 flex items-start gap-2 rounded-xl border border-rose-200/80 bg-rose-50/70 p-3 text-xs text-rose-700"
+                            className="mb-4 flex items-start gap-2 rounded-xl border border-rose-200/80 bg-rose-50/70 p-3 text-sm text-rose-700"
                         >
                             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
                             <span>{errorMsg}</span>
@@ -208,7 +208,7 @@ export default function LoginPage() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mb-4 flex items-start gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/80 p-3 text-xs text-emerald-800"
+                            className="mb-4 flex items-start gap-2 rounded-xl border border-emerald-200/80 bg-emerald-50/80 p-3 text-sm text-emerald-800"
                         >
                             <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
                             <span>{successMsg}</span>
@@ -220,10 +220,10 @@ export default function LoginPage() {
                 {mode === 'reset' ? (
                     <form
                         onSubmit={handleResetPassword}
-                        className="space-y-3.5"
+                        className="space-y-4"
                     >
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                 Mật khẩu mới (tối thiểu 6 ký tự)
                             </label>
                             <div className="relative">
@@ -235,27 +235,27 @@ export default function LoginPage() {
                                         setPassword(e.target.value)
                                     }
                                     placeholder="••••••••"
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-3.5 w-3.5" />
+                                        <EyeOff className="h-4 w-4" />
                                     ) : (
-                                        <Eye className="h-3.5 w-3.5" />
+                                        <Eye className="h-4 w-4" />
                                     )}
                                 </button>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                 Nhập lại mật khẩu mới
                             </label>
                             <div className="relative">
@@ -271,7 +271,7 @@ export default function LoginPage() {
                                         setConfirmPassword(e.target.value)
                                     }
                                     placeholder="••••••••"
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                 />
                                 <button
                                     type="button"
@@ -280,13 +280,13 @@ export default function LoginPage() {
                                             !showConfirmPassword,
                                         )
                                     }
-                                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                                     tabIndex={-1}
                                 >
                                     {showConfirmPassword ? (
-                                        <EyeOff className="h-3.5 w-3.5" />
+                                        <EyeOff className="h-4 w-4" />
                                     ) : (
-                                        <Eye className="h-3.5 w-3.5" />
+                                        <Eye className="h-4 w-4" />
                                     )}
                                 </button>
                             </div>
@@ -295,13 +295,13 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
+                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
                         >
                             {loading ? (
-                                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                             ) : (
                                 <>
-                                    <KeyRound className="h-3.5 w-3.5" /> Lưu mật
+                                    <KeyRound className="h-4 w-4" /> Lưu mật
                                     khẩu mới
                                 </>
                             )}
@@ -311,10 +311,10 @@ export default function LoginPage() {
                     /* FORGOT PASSWORD FORM */
                     <form
                         onSubmit={handleForgotPassword}
-                        className="space-y-3.5"
+                        className="space-y-4"
                     >
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                 Email công việc
                             </label>
                             <div className="relative">
@@ -324,22 +324,22 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="ten@congty.com"
-                                    className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                    className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 py-2.5 text-sm font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                 />
-                                <Mail className="absolute left-3 top-2 h-3.5 w-3.5 text-slate-400" />
+                                <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
                             </div>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
+                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
                         >
                             {loading ? (
-                                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                             ) : (
                                 <>
-                                    <Mail className="h-3.5 w-3.5" /> Gửi link
+                                    <Mail className="h-4 w-4" /> Gửi link
                                     đặt lại mật khẩu
                                 </>
                             )}
@@ -348,16 +348,16 @@ export default function LoginPage() {
                         <button
                             type="button"
                             onClick={() => switchMode('login')}
-                            className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition pt-1"
+                            className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition pt-1"
                         >
-                            <ArrowLeft className="h-3 w-3" /> Quay lại đăng nhập
+                            <ArrowLeft className="h-3.5 w-3.5" /> Quay lại đăng nhập
                         </button>
                     </form>
                 ) : (
                     /* LOGIN FORM */
-                    <form onSubmit={handleAuth} className="space-y-3.5">
+                    <form onSubmit={handleAuth} className="space-y-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                 Email công việc
                             </label>
                             <input
@@ -366,12 +366,12 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="ten@congty.com"
-                                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                 Mật khẩu
                             </label>
                             <div className="relative">
@@ -383,20 +383,20 @@ export default function LoginPage() {
                                         setPassword(e.target.value)
                                     }
                                     placeholder="••••••••"
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 transition"
+                                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 transition"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-3.5 w-3.5" />
+                                        <EyeOff className="h-4 w-4" />
                                     ) : (
-                                        <Eye className="h-3.5 w-3.5" />
+                                        <Eye className="h-4 w-4" />
                                     )}
                                 </button>
                             </div>
@@ -406,7 +406,7 @@ export default function LoginPage() {
                             <button
                                 type="button"
                                 onClick={() => switchMode('forgot')}
-                                className="text-[11px] text-slate-400 hover:text-slate-700 transition underline underline-offset-2"
+                                className="text-xs text-slate-400 hover:text-slate-700 transition underline underline-offset-2"
                             >
                                 Quên mật khẩu?
                             </button>
@@ -415,13 +415,13 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
+                            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98] transition disabled:opacity-50"
                         >
                             {loading ? (
-                                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                             ) : (
                                 <>
-                                    <LogIn className="h-3.5 w-3.5" /> Đăng nhập
+                                    <LogIn className="h-4 w-4" /> Đăng nhập
                                 </>
                             )}
                         </button>
@@ -430,7 +430,7 @@ export default function LoginPage() {
 
                 {mode === 'login' && (
                     <div className="mt-5 border-t border-slate-100 pt-4 text-center">
-                        <p className="text-xs text-slate-500">
+                        <p className="text-sm text-slate-500">
                             Chưa có tài khoản?{' '}
                             <span className="font-medium text-slate-700">
                                 Vui lòng liên hệ Admin để được cấp quyền truy cập

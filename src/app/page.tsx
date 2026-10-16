@@ -190,10 +190,10 @@ export default function SubmitPostPage() {
         {/* KHỐI 1: THÔNG TIN BẮT BUỘC */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-900 text-[11px] font-bold text-white">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-900 text-xs font-bold text-white">
               1
             </span>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
               Thông tin bắt buộc
             </h2>
           </div>
@@ -310,60 +310,60 @@ export default function SubmitPostPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-[11px] font-bold text-slate-600">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-slate-700">
                 3
               </span>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
                 Số liệu ban đầu
               </h2>
             </div>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-xs text-slate-400">
               Có thể để 0 và cập nhật sau
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
-              <label className="text-[11px] font-medium text-slate-500 block mb-1">Likes / Reacts</label>
+              <label className="text-xs font-medium text-slate-600 block mb-1">Likes / Reacts</label>
               <input
                 type="number"
                 min="0"
                 value={likes}
                 onChange={(e) => setLikes(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1.5 text-sm text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
-              <label className="text-[11px] font-medium text-slate-500 block mb-1">Bình luận</label>
+              <label className="text-xs font-medium text-slate-600 block mb-1">Bình luận</label>
               <input
                 type="number"
                 min="0"
                 value={comments}
                 onChange={(e) => setComments(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1.5 text-sm text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
-              <label className="text-[11px] font-medium text-slate-500 block mb-1">Chia sẻ</label>
+              <label className="text-xs font-medium text-slate-600 block mb-1">Chia sẻ</label>
               <input
                 type="number"
                 min="0"
                 value={shares}
                 onChange={(e) => setShares(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1.5 text-sm text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
 
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/30 p-2.5 text-center">
-              <label className="text-[11px] font-medium text-slate-500 block mb-1">Lượt xem</label>
+              <label className="text-xs font-medium text-slate-600 block mb-1">Lượt xem</label>
               <input
                 type="number"
                 min="0"
                 value={views}
                 onChange={(e) => setViews(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full rounded-lg border border-slate-200 bg-white py-1 text-xs text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
+                className="w-full rounded-lg border border-slate-200 bg-white py-1.5 text-sm text-center font-semibold text-slate-900 outline-none focus:border-slate-900"
               />
             </div>
           </div>

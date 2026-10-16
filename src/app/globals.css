@@ -6,7 +6,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 17px;
 }
 
 body {
@@ -14,7 +14,7 @@ body {
   color: var(--foreground);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
-  font-size: 0.9375rem; /* 15px default readable size */
+  font-size: 1rem; /* 17px kích thước chuẩn dễ đọc, tăng 1-2px so với ban đầu */
   line-height: 1.6;
 }
 

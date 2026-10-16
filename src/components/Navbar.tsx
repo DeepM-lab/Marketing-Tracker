@@ -208,7 +208,7 @@ export default function Navbar() {
             ? [
                   {
                       href: '/admin',
-                      label: 'Dashboard',
+                      label: 'Quản trị',
                       icon: BarChart3,
                       admin: true,
                   },
@@ -237,7 +237,7 @@ export default function Navbar() {
                                 <span className="font-bold text-slate-900 tracking-tight text-base sm:text-lg leading-tight">
                                     DeepM
                                 </span>
-                                <span className="text-[10px] sm:text-xs text-slate-400 font-medium leading-none">
+                                <span className="text-xs text-slate-400 font-medium leading-none">
                                     Marketing Tracker
                                 </span>
                             </div>
@@ -248,7 +248,10 @@ export default function Navbar() {
                             <nav className="hidden md:flex items-center gap-1">
                                 {navLinks.map((link) => {
                                     const Icon = link.icon;
-                                    const isActive = pathname === link.href;
+                                    const isActive =
+                                        link.href === '/admin'
+                                            ? pathname.startsWith('/admin')
+                                            : pathname === link.href;
                                     return (
                                         <Link
                                             key={link.href}
@@ -301,13 +304,13 @@ export default function Navbar() {
                                                 {profile?.full_name ||
                                                     user.email?.split('@')[0]}
                                                 {isAdmin && (
-                                                    <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.2 text-[10px] font-bold text-amber-700">
+                                                    <span className="inline-flex items-center gap-0.5 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[11px] font-bold text-amber-700">
                                                         <ShieldCheck className="h-3 w-3" />{' '}
                                                         Admin
                                                     </span>
                                                 )}
                                             </span>
-                                            <span className="text-[10px] text-slate-400 font-mono leading-tight">
+                                            <span className="text-[11.5px] text-slate-400 font-mono leading-tight">
                                                 {user.email}
                                             </span>
                                         </div>
@@ -348,18 +351,18 @@ export default function Navbar() {
                                                         {profile?.full_name ||
                                                             'Nhân viên Marketing'}
                                                     </p>
-                                                    <p className="text-[11px] text-slate-400 font-mono truncate">
+                                                    <p className="text-xs text-slate-400 font-mono truncate">
                                                         {user.email}
                                                     </p>
                                                     <div className="mt-1 flex items-center gap-1">
                                                         {isAdmin ? (
-                                                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 rounded-md px-1.5 py-0.5">
+                                                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 rounded-md px-1.5 py-0.5">
                                                                 <ShieldCheck className="h-3 w-3" />{' '}
                                                                 Quản trị viên
                                                                 (Admin)
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 bg-slate-100 rounded-md px-1.5 py-0.5">
+                                                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 rounded-md px-1.5 py-0.5">
                                                                 <UserIcon className="h-3 w-3" />{' '}
                                                                 Nhân viên
                                                             </span>
@@ -469,7 +472,7 @@ export default function Navbar() {
                                             {profile?.full_name ||
                                                 user.email?.split('@')[0]}
                                         </p>
-                                        <p className="text-[11px] text-slate-500 font-mono truncate">
+                                        <p className="text-xs text-slate-500 font-mono truncate">
                                             {user.email}
                                         </p>
                                     </div>
@@ -484,7 +487,10 @@ export default function Navbar() {
                                 {/* Nav links */}
                                 {navLinks.map((link) => {
                                     const Icon = link.icon;
-                                    const isActive = pathname === link.href;
+                                    const isActive =
+                                        link.href === '/admin'
+                                            ? pathname.startsWith('/admin')
+                                            : pathname === link.href;
                                     return (
                                         <Link
                                             key={link.href}
@@ -569,7 +575,7 @@ export default function Navbar() {
                                         <h3 className="text-sm font-bold text-slate-900">
                                             Hồ sơ cá nhân
                                         </h3>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-xs text-slate-400">
                                             Thông tin tài khoản thành viên DeepM
                                         </p>
                                     </div>
@@ -595,7 +601,7 @@ export default function Navbar() {
                                                 'Chưa cập nhật tên'}
                                         </h4>
                                         <span
-                                            className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold mt-0.5 ${
+                                            className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] font-semibold mt-0.5 ${
                                                 isAdmin
                                                     ? 'bg-amber-100 text-amber-800'
                                                     : 'bg-slate-200 text-slate-800'
@@ -610,7 +616,7 @@ export default function Navbar() {
                                 </div>
 
                                 <div className="space-y-2.5 text-xs text-slate-600">
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100">
+                                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/50 border border-slate-100">
                                         <span className="flex items-center gap-1.5 text-slate-500">
                                             <Mail className="h-3.5 w-3.5" />{' '}
                                             Email
@@ -620,7 +626,7 @@ export default function Navbar() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100">
+                                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/50 border border-slate-100">
                                         <span className="flex items-center gap-1.5 text-slate-500">
                                             <Calendar className="h-3.5 w-3.5" />{' '}
                                             Ngày đăng ký
@@ -647,7 +653,7 @@ export default function Navbar() {
                                             setNewPassword('');
                                             setConfirmNewPassword('');
                                         }}
-                                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                                     >
                                         <KeyRound className="h-3.5 w-3.5 text-slate-500" />{' '}
                                         Đổi mật khẩu
@@ -657,7 +663,7 @@ export default function Navbar() {
                                         onClick={() =>
                                             setShowProfileModal(false)
                                         }
-                                        className="flex-1 rounded-xl bg-slate-900 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
+                                        className="flex-1 rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white hover:bg-slate-800 transition"
                                     >
                                         Đóng
                                     </button>
@@ -688,7 +694,7 @@ export default function Navbar() {
                                         <h3 className="text-sm font-bold text-slate-900">
                                             Đổi mật khẩu
                                         </h3>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-xs text-slate-400">
                                             Yêu cầu xác minh mật khẩu hiện tại
                                         </p>
                                     </div>
@@ -702,14 +708,14 @@ export default function Navbar() {
                             </div>
 
                             {passwordError && (
-                                <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700">
+                                <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-sm text-rose-700">
                                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
                                     <span>{passwordError}</span>
                                 </div>
                             )}
 
                             {passwordSuccess && (
-                                <div className="mt-3 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800">
+                                <div className="mt-3 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-sm text-emerald-800">
                                     <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
                                     <span>{passwordSuccess}</span>
                                 </div>
@@ -717,11 +723,11 @@ export default function Navbar() {
 
                             <form
                                 onSubmit={handleChangePassword}
-                                className="mt-4 space-y-3"
+                                className="mt-4 space-y-3.5"
                             >
                                 {/* 1. MẬT KHẨU CŨ */}
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">
                                         Mật khẩu hiện tại (cũ){' '}
                                         <span className="text-rose-500">*</span>
                                     </label>
@@ -738,7 +744,7 @@ export default function Navbar() {
                                                 setOldPassword(e.target.value)
                                             }
                                             placeholder="Nhập mật khẩu hiện tại"
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pr-9 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                         />
                                         <button
                                             type="button"
@@ -747,12 +753,12 @@ export default function Navbar() {
                                                     !showOldPassword,
                                                 )
                                             }
-                                            className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                                         >
                                             {showOldPassword ? (
-                                                <EyeOff className="h-3.5 w-3.5" />
+                                                <EyeOff className="h-4 w-4" />
                                             ) : (
-                                                <Eye className="h-3.5 w-3.5" />
+                                                <Eye className="h-4 w-4" />
                                             )}
                                         </button>
                                     </div>
@@ -760,7 +766,7 @@ export default function Navbar() {
 
                                 {/* 2. MẬT KHẨU MỚI */}
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">
                                         Mật khẩu mới (tối thiểu 6 ký tự){' '}
                                         <span className="text-rose-500">*</span>
                                     </label>
@@ -777,7 +783,7 @@ export default function Navbar() {
                                                 setNewPassword(e.target.value)
                                             }
                                             placeholder="••••••••"
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pr-9 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                         />
                                         <button
                                             type="button"
@@ -786,12 +792,12 @@ export default function Navbar() {
                                                     !showNewPassword,
                                                 )
                                             }
-                                            className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                                         >
                                             {showNewPassword ? (
-                                                <EyeOff className="h-3.5 w-3.5" />
+                                                <EyeOff className="h-4 w-4" />
                                             ) : (
-                                                <Eye className="h-3.5 w-3.5" />
+                                                <Eye className="h-4 w-4" />
                                             )}
                                         </button>
                                     </div>
@@ -799,7 +805,7 @@ export default function Navbar() {
 
                                 {/* 3. XÁC NHẬN MẬT KHẨU MỚI */}
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">
                                         Xác nhận mật khẩu mới{' '}
                                         <span className="text-rose-500">*</span>
                                     </label>
@@ -818,7 +824,7 @@ export default function Navbar() {
                                                 )
                                             }
                                             placeholder="••••••••"
-                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pr-9 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                                            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                         />
                                         <button
                                             type="button"
@@ -827,12 +833,12 @@ export default function Navbar() {
                                                     !showConfirmNewPassword,
                                                 )
                                             }
-                                            className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
                                         >
                                             {showConfirmNewPassword ? (
-                                                <EyeOff className="h-3.5 w-3.5" />
+                                                <EyeOff className="h-4 w-4" />
                                             ) : (
-                                                <Eye className="h-3.5 w-3.5" />
+                                                <Eye className="h-4 w-4" />
                                             )}
                                         </button>
                                     </div>
@@ -844,14 +850,14 @@ export default function Navbar() {
                                         onClick={() =>
                                             setShowPasswordModal(false)
                                         }
-                                        className="rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                                        className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
                                     >
                                         Hủy
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={passwordLoading}
-                                        className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+                                        className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition"
                                     >
                                         {passwordLoading
                                             ? 'Đang xác minh...'

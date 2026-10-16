@@ -41,11 +41,60 @@ create policy "Xem profiles an toàn"
     auth.uid() = id or public.is_admin()
   );
 
--- Người dùng tự cập nhật profile của chính mình
+-- Cho phép người dùng sửa profile của chính mình HOẶC Admin sửa profile nhân viên
+drop policy if exists "Cho phép sửa profiles" on public.profiles;
 create policy "Cho phép sửa profiles"
   on public.profiles for update
   to authenticated
-  using (auth.uid() = id);
+  using (
+    auth.uid() = id or public.is_admin()
+  );
+
+-- Cho phép Admin xóa profile nhân viên khi nghỉ việc (không được tự xóa chính mình)
+drop policy if exists "Admin có thể xóa profile nhân viên" on public.profiles;
+create policy "Admin có thể xóa profile nhân viên"
+  on public.profiles for delete
+  to authenticated
+  using (
+    public.is_admin() and auth.uid() <> id
+  );
+
+-- Function RPC đổi quyền người dùng an toàn (Security Definer)
+create or replace function public.admin_set_user_role(target_user_id uuid, new_role text)
+returns boolean as $$
+begin
+  if not exists (select 1 from public.profiles where id = auth.uid() and role = 'admin') then
+    raise exception 'Chỉ Quản trị viên mới có quyền đổi vai trò.';
+  end if;
+
+  if target_user_id = auth.uid() and new_role <> 'admin' then
+    raise exception 'Không thể tự hạ quyền của chính mình.';
+  end if;
+
+  update public.profiles
+  set role = new_role
+  where id = target_user_id;
+
+  return true;
+end;
+$$ language plpgsql security definer;
+
+-- Function RPC xóa profile nhân viên an toàn (Security Definer)
+create or replace function public.admin_delete_staff_profile(target_user_id uuid)
+returns boolean as $$
+begin
+  if not exists (select 1 from public.profiles where id = auth.uid() and role = 'admin') then
+    raise exception 'Chỉ Quản trị viên mới có quyền xóa nhân viên.';
+  end if;
+
+  if target_user_id = auth.uid() then
+    raise exception 'Không thể tự xóa chính mình.';
+  end if;
+
+  delete from public.profiles where id = target_user_id;
+  return true;
+end;
+$$ language plpgsql security definer;
 
 -- Trigger tự động tạo profile khi người dùng được tạo qua Supabase Auth
 create or replace function public.handle_new_user()
