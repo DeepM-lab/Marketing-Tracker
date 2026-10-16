@@ -1,5 +1,5 @@
 -- =========================================================================
--- FILE CẬP NHẬT CHÍNH XÁC (SỬA LỖI ĐỆ QUY RLS VÀ CẬP NHẬT ADMIN DEEPMLAB)
+-- SCHEMA CƠ SỞ DỮ LIỆU DEEPM MARKETING (PROFILES & POSTS)
 -- =========================================================================
 
 -- 1. BẢNG PROFILES (Thông tin người dùng & phân quyền)
@@ -31,11 +31,15 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- Policy Profiles: Mọi người dùng đã đăng nhập đều có thể đọc profiles (cần thiết để hiển thị tên người đăng)
-create policy "Cho phép đọc profiles"
+-- Policy Profiles: Nhân viên chỉ đọc profile của mình, Admin đọc được tất cả
+drop policy if exists "Cho phép đọc profiles" on public.profiles;
+drop policy if exists "Xem profiles an toàn" on public.profiles;
+create policy "Xem profiles an toàn"
   on public.profiles for select
   to authenticated
-  using (true);
+  using (
+    auth.uid() = id or public.is_admin()
+  );
 
 -- Người dùng tự cập nhật profile của chính mình
 create policy "Cho phép sửa profiles"
@@ -43,7 +47,7 @@ create policy "Cho phép sửa profiles"
   to authenticated
   using (auth.uid() = id);
 
--- Trigger tự động tạo profile khi người dùng đăng ký qua Supabase Auth
+-- Trigger tự động tạo profile khi người dùng được tạo qua Supabase Auth
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
@@ -52,10 +56,9 @@ begin
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
-    case when new.email = 'deepmlab12@gmail.com' then 'admin' else 'staff' end
+    'staff' -- Mặc định tất cả người dùng tạo mới đều là staff
   )
-  on conflict (id) do update set
-    role = case when excluded.email = 'deepmlab12@gmail.com' then 'admin' else profiles.role end;
+  on conflict (id) do nothing;
   return new;
 end;
 $$ language plpgsql security definer;

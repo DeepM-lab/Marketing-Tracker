@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client';
 import { translateSupabaseError } from '@/lib/utils/errorMessages';
 import {
     LogIn,
-    UserPlus,
     AlertCircle,
     Eye,
     EyeOff,
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type AuthMode = 'login' | 'signup' | 'forgot' | 'reset';
+type AuthMode = 'login' | 'forgot' | 'reset';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -30,7 +29,6 @@ export default function LoginPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
@@ -136,39 +134,13 @@ export default function LoginPage() {
         resetMessages();
 
         try {
-            if (mode === 'signup') {
-                if (password !== confirmPassword) {
-                    throw new Error(
-                        'Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.',
-                    );
-                }
-                if (password.length < 6) {
-                    throw new Error('Mật khẩu phải có ít nhất 6 ký tự.');
-                }
-
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                        },
-                    },
-                });
-                if (error) throw error;
-                setSuccessMsg(
-                    'Đăng ký thành công! Hãy đăng nhập bằng tài khoản vừa tạo.',
-                );
-                switchMode('login');
-            } else {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                router.push('/');
-                router.refresh();
-            }
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (error) throw error;
+            router.push('/');
+            router.refresh();
         } catch (err: unknown) {
             const error = err as Error;
             setErrorMsg(
@@ -201,22 +173,18 @@ export default function LoginPage() {
                         />
                     </div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">
-                        {mode === 'signup'
-                            ? 'Tạo tài khoản DeepM'
-                            : mode === 'forgot'
-                              ? 'Quên mật khẩu'
-                              : mode === 'reset'
-                                ? 'Thiết lập mật khẩu mới'
-                                : 'Đăng nhập DeepM Marketing'}
+                        {mode === 'forgot'
+                            ? 'Quên mật khẩu'
+                            : mode === 'reset'
+                              ? 'Thiết lập mật khẩu mới'
+                              : 'Đăng nhập DeepM Marketing'}
                     </h1>
                     <p className="mt-1 text-xs text-slate-500">
-                        {mode === 'signup'
-                            ? 'Nhập thông tin nhân viên để bắt đầu báo cáo bài đăng'
-                            : mode === 'forgot'
-                              ? 'Nhập email để nhận liên kết đặt lại mật khẩu'
-                              : mode === 'reset'
-                                ? 'Nhập mật khẩu mới cho tài khoản của bạn'
-                                : 'Hệ thống quản lý & theo dõi tiến độ marketing nội bộ'}
+                        {mode === 'forgot'
+                            ? 'Nhập email để nhận liên kết đặt lại mật khẩu'
+                            : mode === 'reset'
+                              ? 'Nhập mật khẩu mới cho tài khoản của bạn'
+                              : 'Hệ thống quản lý & theo dõi tiến độ marketing nội bộ'}
                     </p>
                 </div>
 
@@ -386,26 +354,8 @@ export default function LoginPage() {
                         </button>
                     </form>
                 ) : (
-                    /* LOGIN / SIGNUP FORM */
+                    /* LOGIN FORM */
                     <form onSubmit={handleAuth} className="space-y-3.5">
-                        {mode === 'signup' && (
-                            <div>
-                                <label className="block text-xs font-medium text-slate-700 mb-1">
-                                    Họ và tên
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={fullName}
-                                    onChange={(e) =>
-                                        setFullName(e.target.value)
-                                    }
-                                    placeholder="Nguyễn Văn A"
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                                />
-                            </div>
-                        )}
-
                         <div>
                             <label className="block text-xs font-medium text-slate-700 mb-1">
                                 Email công việc
@@ -452,57 +402,15 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {mode === 'signup' && (
-                            <div>
-                                <label className="block text-xs font-medium text-slate-700 mb-1">
-                                    Nhập lại mật khẩu
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={
-                                            showConfirmPassword
-                                                ? 'text'
-                                                : 'password'
-                                        }
-                                        required
-                                        value={confirmPassword}
-                                        onChange={(e) =>
-                                            setConfirmPassword(e.target.value)
-                                        }
-                                        placeholder="••••••••"
-                                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-9 text-xs font-normal text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setShowConfirmPassword(
-                                                !showConfirmPassword,
-                                            )
-                                        }
-                                        className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 transition"
-                                        tabIndex={-1}
-                                    >
-                                        {showConfirmPassword ? (
-                                            <EyeOff className="h-3.5 w-3.5" />
-                                        ) : (
-                                            <Eye className="h-3.5 w-3.5" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {mode === 'login' && (
-                            <div className="flex justify-end">
-                                <button
-                                    type="button"
-                                    onClick={() => switchMode('forgot')}
-                                    className="text-[11px] text-slate-400 hover:text-slate-700 transition underline underline-offset-2"
-                                >
-                                    Quên mật khẩu?
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => switchMode('forgot')}
+                                className="text-[11px] text-slate-400 hover:text-slate-700 transition underline underline-offset-2"
+                            >
+                                Quên mật khẩu?
+                            </button>
+                        </div>
 
                         <button
                             type="submit"
@@ -511,11 +419,6 @@ export default function LoginPage() {
                         >
                             {loading ? (
                                 <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                            ) : mode === 'signup' ? (
-                                <>
-                                    <UserPlus className="h-3.5 w-3.5" /> Đăng ký
-                                    tài khoản
-                                </>
                             ) : (
                                 <>
                                     <LogIn className="h-3.5 w-3.5" /> Đăng nhập
@@ -525,21 +428,14 @@ export default function LoginPage() {
                     </form>
                 )}
 
-                {mode !== 'forgot' && mode !== 'reset' && (
+                {mode === 'login' && (
                     <div className="mt-5 border-t border-slate-100 pt-4 text-center">
-                        <button
-                            type="button"
-                            onClick={() =>
-                                switchMode(
-                                    mode === 'login' ? 'signup' : 'login',
-                                )
-                            }
-                            className="text-xs font-medium text-slate-600 hover:text-slate-900 transition underline underline-offset-4"
-                        >
-                            {mode === 'signup'
-                                ? 'Đã có tài khoản? Đăng nhập ngay'
-                                : 'Chưa có tài khoản? Nhấn để đăng ký'}
-                        </button>
+                        <p className="text-xs text-slate-500">
+                            Chưa có tài khoản?{' '}
+                            <span className="font-medium text-slate-700">
+                                Vui lòng liên hệ Admin để được cấp quyền truy cập
+                            </span>
+                        </p>
                     </div>
                 )}
             </motion.div>
